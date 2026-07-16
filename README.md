@@ -190,4 +190,12 @@ A low confidence threshold can increase false positives. If you need very high a
 
 ## License
 
-Released under the MIT License. See the [LICENSE](LICENSE) file for details.
+Released under the **GNU Affero General Public License v3.0 (AGPL-3.0)** — see
+[LICENSE](LICENSE). This is required because the project depends on
+[Ultralytics YOLO](https://github.com/ultralytics/ultralytics) (AGPL-3.0) and
+[PyQt5](https://pypi.org/project/PyQt5/) (GPL-3.0).
+
+See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for all dependency
+licenses. **Note:** the InsightFace face/gender models are licensed for
+non-commercial research use only, and the project as a whole is not suitable
+for proprietary/commercial distribution as-is.
