@@ -182,7 +182,8 @@ def build_stylesheet() -> str:
         padding: 14px;
         font-family: "Cascadia Mono", "Consolas", monospace;
         font-size: 14px;
-        color: {c['text_muted']};
+        color: #d6dcea;
+        selection-background-color: {c['accent']};
     }}
 
     /* scrollbar */

@@ -59,15 +59,43 @@ def _run(args: list[str]) -> None:
     subprocess.run(cmd, cwd=ROOT, check=True)
 
 
+def _fix_vc_runtime(app_name: str) -> None:
+    """Overwrite bundled VC++ runtime DLLs with the system (newer) version.
+
+    PyQt5 bundles an old VC++ runtime (14.26) under Qt5/bin. It loads before
+    torch's required newer runtime and breaks torch's DLL init (c10.dll
+    WinError 1114). Replace every copy with the system's.
+    """
+    import shutil
+
+    system32 = Path(os.environ.get("SystemRoot", r"C:\Windows")) / "System32"
+    internal = ROOT / "dist" / app_name / "_internal"
+    if not internal.is_dir():
+        return
+    names = ("MSVCP140.dll", "MSVCP140_1.dll", "VCRUNTIME140.dll", "VCRUNTIME140_1.dll")
+    for name in names:
+        src = system32 / name
+        if not src.exists():
+            continue
+        for dst in internal.rglob(name):
+            try:
+                shutil.copy2(src, dst)
+            except OSError:
+                pass
+
+
 def build_gui() -> None:
+    # Built as a console app (native libs like torch fail to initialize in a
+    # windowed build); the console window is hidden at runtime in main.py.
     _run([
         *_common_args(),
-        "--windowed",
+        "--console",
         "--name", "HumanPhotoClassifier",
         "--icon", "assets/icon.ico",
         "--add-data", "assets;assets",
         "main.py",
     ])
+    _fix_vc_runtime("HumanPhotoClassifier")
 
 
 def build_cli() -> None:
