@@ -189,10 +189,11 @@ class InsightFaceAnalyzer(ImageFaceAnalyzer):
 
     @staticmethod
     def _read_image(path: Path):
-        """Read an image safely even for non-ASCII paths (e.g. Korean).
+        """Read an image as a BGR array, handling non-ASCII paths and HEIC.
 
         ``cv2.imread`` cannot handle non-ASCII paths on Windows, so this uses
-        ``numpy.fromfile`` + ``cv2.imdecode`` instead.
+        ``numpy.fromfile`` + ``cv2.imdecode``. For formats OpenCV cannot decode
+        (e.g. HEIC), it falls back to Pillow.
         """
         import cv2
         import numpy as np
@@ -203,11 +204,20 @@ class InsightFaceAnalyzer(ImageFaceAnalyzer):
             raise CorruptImageError(f"Cannot read image: {path}") from exc
 
         image = cv2.imdecode(data, cv2.IMREAD_COLOR)
-        if image is None:
+        if image is not None:
+            return image
+
+        # OpenCV could not decode it (e.g. HEIC); try Pillow.
+        try:
+            from PIL import Image
+
+            with Image.open(path) as pil_image:
+                rgb = np.asarray(pil_image.convert("RGB"))
+            return cv2.cvtColor(rgb, cv2.COLOR_RGB2BGR)
+        except Exception as exc:  # noqa: BLE001
             raise CorruptImageError(
                 f"Corrupt or unsupported image: {path}"
-            )
-        return image
+            ) from exc
 
     def _to_face_infos(self, faces) -> list[FaceInfo]:
         """Convert InsightFace results into an engine-independent ``FaceInfo`` list."""

@@ -21,7 +21,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 
 # Heavy packages whose data files / submodules must be collected wholesale.
-COLLECT = ["ultralytics", "insightface", "onnxruntime", "cv2", "torch", "torchvision"]
+COLLECT = ["ultralytics", "insightface", "onnxruntime", "cv2", "torch",
+           "torchvision", "pi_heif"]
 
 # Submodules PyInstaller's static analysis can miss.
 HIDDEN = ["scipy", "skimage", "sklearn", "pandas"]

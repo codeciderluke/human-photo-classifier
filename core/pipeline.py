@@ -40,6 +40,16 @@ LogCb = Callable[[str], None]
 StopCb = Callable[[], bool]
 
 
+def _register_heif() -> None:
+    """Enable reading HEIC/HEIF images through Pillow (iPhone photos)."""
+    try:
+        import pi_heif
+
+        pi_heif.register_heif_opener()
+    except Exception:  # noqa: BLE001 - HEIF support is optional
+        pass
+
+
 class PipelineError(RuntimeError):
     """Fatal error that aborts the whole job (bad folder or model load)."""
 
@@ -98,6 +108,8 @@ def run_classification(
     log: LogCb = on_log or (lambda _m: None)
     progress: ProgressCb = on_progress or (lambda _c, _t: None)
     stop: StopCb = should_stop or (lambda: False)
+
+    _register_heif()
 
     # 1) Collect images
     try:

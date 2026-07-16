@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 #: Default image extensions to scan.
 DEFAULT_IMAGE_EXTENSIONS: frozenset[str] = frozenset(
-    {".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tif", ".tiff"}
+    {".jpg", ".jpeg", ".png", ".bmp", ".webp", ".tif", ".tiff", ".heic", ".heif"}
 )
 
 

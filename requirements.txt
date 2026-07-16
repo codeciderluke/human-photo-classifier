@@ -6,6 +6,7 @@ pytest>=8.0
 insightface>=0.7.3
 opencv-python>=4.8
 pillow>=10.0
+pi-heif>=0.13  # read HEIC/HEIF images (iPhone photos)
 
 # Face analysis runtime engine — install one of the two
 #   GPU (recommended, CUDA 12 + cuDNN 9): onnxruntime-gpu
