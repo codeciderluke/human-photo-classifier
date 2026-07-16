@@ -13,6 +13,7 @@ Model weights are downloaded at first run, so they are not bundled.
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -25,6 +26,20 @@ COLLECT = ["ultralytics", "insightface", "onnxruntime", "cv2", "torch", "torchvi
 # Submodules PyInstaller's static analysis can miss.
 HIDDEN = ["scipy", "skimage", "sklearn", "pandas"]
 
+# Unused heavy modules that break or bloat the build (onnx reference evaluator).
+EXCLUDE = ["onnx.reference"]
+
+
+def _extra_data() -> list[str]:
+    """Data files insightface resolves via a path that collect-all misses."""
+    import insightface
+
+    objects = Path(insightface.__file__).parent / "data" / "objects"
+    if objects.is_dir():
+        # insightface looks for these at <bundle>/objects/ when frozen.
+        return ["--add-data", f"{objects}{os.pathsep}objects"]
+    return []
+
 
 def _common_args() -> list[str]:
     args: list[str] = ["--noconfirm", "--clean"]
@@ -32,6 +47,9 @@ def _common_args() -> list[str]:
         args += ["--collect-all", pkg]
     for mod in HIDDEN:
         args += ["--collect-submodules", mod]
+    for mod in EXCLUDE:
+        args += ["--exclude-module", mod]
+    args += _extra_data()
     return args
 
 

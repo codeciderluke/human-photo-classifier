@@ -3,6 +3,8 @@
 A desktop application that automatically selects and copies **only the photos that contain people**, powered by YOLO.
 The person-detection logic is fully decoupled from the GUI, so it can be reused unchanged across CLI, batch jobs, server APIs, tests, and more.
 
+![Human Photo Classifier GUI](assets/screenshot.png)
+
 ## Download
 
 Pre-built Windows executables (GUI and CLI) are attached to each
