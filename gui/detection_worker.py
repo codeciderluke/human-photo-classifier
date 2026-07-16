@@ -56,4 +56,8 @@ class DetectionWorker(QThread):
         except PipelineError as exc:
             self.failed.emit(str(exc))
             return
+        except Exception as exc:  # noqa: BLE001 - report, never crash the thread
+            logger.exception("Unexpected error in worker")
+            self.failed.emit(f"Unexpected error: {exc}")
+            return
         self.finished_summary.emit(summary)

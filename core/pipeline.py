@@ -155,46 +155,32 @@ def run_classification(
             log(f"[Copy failed] {image_path.name}: {exc}")
             return False
 
-    # 3) Process each image
-    for index, image_path in enumerate(images, start=1):
-        if stop():
-            summary.stopped = True
-            break
-
-        image_path = Path(image_path)
-        name = image_path.name
-
+    def handle_image(image_path: Path, name: str) -> None:
+        """Classify and copy one image. Raises nothing the caller must handle
+        specially — the loop wraps this to guarantee one image can never stop
+        the whole run."""
         level = inspect_image(image_path)
         if level == CORRUPT or (level == PARTIAL and not classify_mode):
             summary.corrupt += 1
             log(f"[Corrupt - skipped] {name}")
-            progress(index, summary.total)
-            continue
+            return
         if level == PARTIAL:
             summary.damaged += 1
             if do_copy(image_path, DAMAGED):
                 summary.copied += 1
                 log(f"[Damaged -> others] {name}")
-            progress(index, summary.total)
-            continue
+            return
 
         try:
             result = person_filter.analyze(image_path)
         except CorruptImageError:
             summary.corrupt += 1
             log(f"[Corrupt - skipped] {name}")
-            progress(index, summary.total)
-            continue
+            return
         except ImageAnalysisError:
             summary.failed += 1
             log(f"[Analyze failed] {name}")
-            progress(index, summary.total)
-            continue
-        except Exception as exc:  # noqa: BLE001 - skip per-image errors
-            summary.failed += 1
-            log(f"[Error] {name}: {exc}")
-            progress(index, summary.total)
-            continue
+            return
 
         if result.contains_person:
             summary.with_person += 1
@@ -205,14 +191,27 @@ def run_classification(
             subfolder = OTHERS
             prefix = "Others"
         else:
-            progress(index, summary.total)
-            continue
+            return
 
         if do_copy(image_path, subfolder):
             summary.copied += 1
             label = subfolder.replace("/", " · ") if subfolder else "-"
             log(f"[{prefix} - {label}] {name}")
 
+    # 3) Process each image. A broad guard ensures no single image (or an
+    # unexpected error in any library) can abort the entire run.
+    for index, image_path in enumerate(images, start=1):
+        if stop():
+            summary.stopped = True
+            break
+
+        image_path = Path(image_path)
+        name = image_path.name
+        try:
+            handle_image(image_path, name)
+        except Exception as exc:  # noqa: BLE001 - never let one image kill the run
+            summary.failed += 1
+            log(f"[Error] {name}: {exc}")
         progress(index, summary.total)
 
     summary.category_counts = dict(counts)
@@ -226,7 +225,7 @@ def _categorize(face_analyzer, config: ClassifyConfig, image_path: Path) -> str:
     try:
         face_result = face_analyzer.analyze(image_path)
         return build_subfolder(config.detect_face, config.detect_gender, face_result)
-    except (FaceAnalysisError, CorruptImageError, OSError, ValueError):
+    except Exception:  # noqa: BLE001 - any face error -> unclassified, never abort
         logger.exception("Face analysis failed, using unclassified: %s", image_path)
         return build_subfolder(
             config.detect_face, config.detect_gender, None, analysis_failed=True

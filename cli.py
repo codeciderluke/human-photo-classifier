@@ -104,4 +104,9 @@ def main(argv: list[str] | None = None) -> int:
 
 
 if __name__ == "__main__":
+    # Required for frozen builds so a spawned worker process does not re-run
+    # the whole program.
+    import multiprocessing
+
+    multiprocessing.freeze_support()
     raise SystemExit(main())

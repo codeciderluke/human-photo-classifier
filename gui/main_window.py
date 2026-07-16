@@ -273,6 +273,8 @@ class MainWindow(QWidget):
         self.log_view = QPlainTextEdit()
         self.log_view.setObjectName("log")
         self.log_view.setReadOnly(True)
+        # Cap history so very large batches don't grow memory without bound.
+        self.log_view.setMaximumBlockCount(5000)
         layout.addWidget(self.log_view, stretch=1)
 
         return card

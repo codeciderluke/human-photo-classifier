@@ -85,11 +85,12 @@ def _fix_vc_runtime(app_name: str) -> None:
 
 
 def build_gui() -> None:
-    # Built as a console app (native libs like torch fail to initialize in a
-    # windowed build); the console window is hidden at runtime in main.py.
+    # Windowed (no console window). Native libs load correctly once the stale
+    # PyQt5 VC++ runtime is replaced (see _fix_vc_runtime) and std streams are
+    # repaired at startup (see main.py).
     _run([
         *_common_args(),
-        "--console",
+        "--windowed",
         "--name", "HumanPhotoClassifier",
         "--icon", "assets/icon.ico",
         "--add-data", "assets;assets",

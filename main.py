@@ -114,4 +114,9 @@ def main() -> int:
 
 
 if __name__ == "__main__":
+    # Required for frozen builds: a spawned worker process re-runs this exe;
+    # freeze_support() makes it act as the worker instead of relaunching the app.
+    import multiprocessing
+
+    multiprocessing.freeze_support()
     raise SystemExit(main())
