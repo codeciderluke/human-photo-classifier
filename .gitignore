@@ -1,0 +1,26 @@
+# Virtual environments
+.venv/
+.venv-build/
+venv/
+
+# PyInstaller build output (ship EXEs via GitHub Releases, not git)
+build/
+dist/
+*.spec
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# YOLO model weights (auto-downloaded at runtime)
+*.pt
+
+# OS / editor
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/
+
+# Internal design spec (not part of the public release)
+person_filter_refactoring_spec.md

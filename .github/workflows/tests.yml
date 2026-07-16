@@ -1,0 +1,19 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # The unit tests mock the heavy models (a fake ultralytics is injected),
+      # so only pytest and Pillow are needed.
+      - run: pip install pytest pillow
+      - run: python -m pytest -q

@@ -1,0 +1,15 @@
+ultralytics>=8.3.0
+PyQt5>=5.15
+pytest>=8.0
+
+# Face detection / gender detection (optional features)
+insightface>=0.7.3
+opencv-python>=4.8
+pillow>=10.0
+
+# Face analysis runtime engine — install one of the two
+#   GPU (recommended, CUDA 12 + cuDNN 9): onnxruntime-gpu
+#   CPU only: onnxruntime
+# GPU DLLs reuse those bundled by PyTorch (cu124), so no CUDA toolkit needed.
+onnxruntime-gpu>=1.17; platform_system == "Windows"
+onnxruntime>=1.17; platform_system != "Windows"
