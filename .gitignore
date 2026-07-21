@@ -22,5 +22,6 @@ Thumbs.db
 .idea/
 .vscode/
 
-# Internal design spec (not part of the public release)
+# Internal notes (not part of the public release)
 person_filter_refactoring_spec.md
+CLAUDE.md
